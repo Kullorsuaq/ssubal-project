@@ -1,0 +1,28 @@
+.profileContainer {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  background-color: #f1f5f9;
+  flex-shrink: 0;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  transition: color 0.15s ease;
+}
+
+.profileContainer:hover .name {
+  color: #2563eb; 
+}

@@ -1,0 +1,135 @@
+.boardContainer {
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.boardList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.boardItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.boardItem:last-child {
+  border-bottom: none;
+}
+
+.boardItem:hover {
+  background-color: #fafafa;
+}
+
+.itemLink {
+  flex: 1;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.itemMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.statusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.statusRecruiting {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.statusClosed {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+}
+
+.itemTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detailButton {
+  flex-shrink: 0;
+  margin-left: 12px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.detailButton:hover {
+  background-color: color-mix(in srgb, var(--theme-color) 12%, #ffffff);
+  border-color: color-mix(in srgb, var(--theme-color) 30%, transparent);
+  color: #111827;
+}
+
+.detailButton:active {
+  transform: scale(0.97);
+}
+
+.emptyContainer {
+  padding: 40px 0;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+@media (max-width: 480px) {
+  .boardItem {
+    padding: 12px 14px;
+  }
+
+  .itemTitle {
+    font-size: 14px;
+  }
+
+  .detailButton {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,73 @@
+.navigationBar {
+  position: fixed;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  left: 16px;
+  right: 16px;
+  height: var(--bottom-nav-height, 60px);
+  
+  background-color: var(--card-bg, #ffffff);
+  
+  border-radius: 20px;
+  
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  
+  z-index: 1000;
+  
+  /* 아이폰 하단 바 위쪽에 얹히도록 overflow 정리 */
+  overflow: hidden;
+}
+
+.navList {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0 8px;
+}
+
+.navItem {
+  flex: 1;
+  height: 100%;
+}
+
+.navLink {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  text-decoration: none;
+  color: var(--text-secondary, #64748b);
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  border-radius: 12px;
+}
+
+.navLink:active {
+  transform: scale(0.94);
+  opacity: 0.8;
+}
+
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge {
+  position: absolute;
+  top: -1px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  background-color: #EF4444;
+  border-radius: 50%;
+  border: 1.5px solid #ffffff;
+}

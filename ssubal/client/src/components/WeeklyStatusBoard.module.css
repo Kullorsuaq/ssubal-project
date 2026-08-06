@@ -1,0 +1,146 @@
+.container {
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  margin: 12px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 320px;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #ffffff;
+  border-right: 1px solid #F3F4F6;
+}
+
+.dayColumn:last-child {
+  border-right: none;
+}
+
+.todayColumn {
+  background-color: color-mix(in srgb, var(--theme-color) 4%, #ffffff);
+}
+
+.header {
+  width: 100%;
+  padding: 10px 0 8px 0;
+  text-align: center;
+  border-bottom: 1px solid #F3F4F6;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.todayHeader {
+  background-color: color-mix(in srgb, var(--theme-color) 8%, #ffffff);
+}
+
+.dayText {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4B5563;
+  display: block;
+}
+
+.todayText {
+  color: #111827;
+  font-weight: 700;
+}
+
+.sunText {
+  color: #EF4444;
+}
+
+.satText {
+  color: #2563EB;
+}
+
+.dateText {
+  display: block;
+  font-size: 11px;
+  color: #9CA3AF;
+  margin-top: 2px;
+}
+
+.todayColumn .dateText {
+  color: #4B5563;
+  font-weight: 600;
+}
+
+.workerList {
+  width: 100%;
+  min-height: 120px;
+  padding: 8px 2px 24px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.workerBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 2px;
+  border-radius: 5px;
+  text-align: center;
+  width: 96%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  background-color: color-mix(in srgb, var(--theme-color) 12%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--theme-color) 25%, transparent);
+  color: #1F2937;
+}
+
+.emptyText {
+  font-size: 11px;
+  color: #D1D5DB;
+  margin-top: 24px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px 6px;
+  }
+
+  .header {
+    padding: 8px 0 6px 0;
+  }
+
+  .dayText {
+    font-size: 12px;
+  }
+
+  .dateText {
+    font-size: 11px;
+  }
+
+  .workerList {
+    padding: 6px 1px 20px 1px;
+    gap: 3px;
+    min-height: 110px;
+  }
+
+  .workerBadge {
+    font-size: 11px;
+    padding: 3px 1px;
+    border-radius: 4px;
+    width: 98%;
+  }
+}

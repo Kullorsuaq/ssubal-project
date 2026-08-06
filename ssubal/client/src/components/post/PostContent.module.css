@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.loadingBox {
+  padding: 40px 0;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.statusBadge.recruiting {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.statusBadge.closed {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.createdAt {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.writerProfile {
+  display: flex;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+.infoBox {
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.infoLabel {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.infoValue {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.contentBody {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-wrap; 
+  padding: 8px 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+}
+
+.editBtn, .deleteBtn {
+  flex: 1;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.editBtn {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.editBtn:hover {
+  background-color: #e2e8f0;
+}
+
+.deleteBtn {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.deleteBtn:hover {
+  background-color: #fecaca;
+}
