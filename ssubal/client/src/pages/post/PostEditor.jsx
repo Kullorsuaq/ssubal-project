@@ -49,6 +49,13 @@ const PostEditor = () => {
         scheduleId: post.schedule_id || '',
         isAlert: false
       });
+      setSelectedSchedule({
+        start_time: post.start_time,
+        end_time: post.end_time,
+        date: post.date,
+        wage: post.wage,
+        id: post.schedule_id
+      });
     }
   }, [isEditMode, location.state]);
 
@@ -80,7 +87,13 @@ const PostEditor = () => {
         return;
       }
       
-      setSelectedSchedule(schedule);
+      setSelectedSchedule({
+        start_time: schedule.start_time,
+        end_time: schedule.end_time,
+        date: schedule.date,
+        wage: schedule.wage,
+        id: schedule.id
+      });
 
       setFormData((prev) => ({ 
         ...prev, 

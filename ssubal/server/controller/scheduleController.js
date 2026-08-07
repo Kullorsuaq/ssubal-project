@@ -143,15 +143,19 @@ const acceptApplicant = async (req, res) => {
         }
 
         const originEnd = String(targetFlexSchedule.end_time).substring(0,5);
+        
+        console.log(originEnd, subEnd);
 
         if(originEnd !== subEnd) {
-          await connection.query(
+          console.log('여기 실행');
+          const result = await connection.query(
             `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage)
             select ?, \`date\`, ?, ?, ?, wage
             from substitute_posts_data
             where id = ?`,
             [writerId, position, subEnd, originEnd, postId]
           )
+          console.log(result);
         }
 
         await connection.query(
