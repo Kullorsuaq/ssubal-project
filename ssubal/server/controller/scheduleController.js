@@ -128,6 +128,7 @@ const acceptApplicant = async (req, res) => {
       await connection.query(
         `delete from flexible_schedules where id = ?`, [originFlexId]
       );
+      console.log('여기 실행!', targetFlexSchedule);
 
       if(targetFlexSchedule) {      
         const originStart = String(targetFlexSchedule.start_time).substring(0,5);
@@ -143,7 +144,7 @@ const acceptApplicant = async (req, res) => {
         }
 
         const originEnd = String(targetFlexSchedule.end_time).substring(0,5);
-        
+
         console.log(originEnd, subEnd);
 
         if(originEnd !== subEnd) {
