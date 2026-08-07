@@ -444,6 +444,13 @@ const getMonthlySchedules = async (req, res) => {
           }
         }
       })
+
+      calendarSchedules[dateStr].sort((a, b) => {
+        if (!a.start_time) return 1;
+        if (!b.start_time) return -1;
+
+        return a.start_time.localeCompare(b.start_time);
+      });
     }
     
     res.status(200).json({
