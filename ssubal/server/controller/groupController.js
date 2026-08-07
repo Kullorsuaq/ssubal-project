@@ -99,7 +99,7 @@ const createGroup = async (req, res) => {
       pos.endTime,
       pos.wage
     ]);
-    
+
     //group_positions에 그룹 포지션 추가하기
     //mysql2 패키지는 이중 배열을 넣으면 알아서 bulk 포맷으로 바꿔줌
     if(refinedPositionList && refinedPositionList.length > 0) {
@@ -107,7 +107,7 @@ const createGroup = async (req, res) => {
     }
 
     //group_participants에 role admin으로 추가하기
-    await connection.query(`insert into group_participants (group_id, user_id, role) values (?, ?, ?)`, [newGroupId, userId, 'ADMIN']);
+    await connection.query(`insert into group_participants (group_id, user_id, role) values (?, ?, ?)`, [newGroupId, userId, 'OWNER']);
 
     await connection.commit();
 

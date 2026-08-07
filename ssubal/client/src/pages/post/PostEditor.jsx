@@ -34,6 +34,8 @@ const PostEditor = () => {
     isAlert: false
   });
 
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
+
   useEffect(() => {
     if(isEditMode && location.state?.post) { 
       const { post } = location.state; 
@@ -52,6 +54,21 @@ const PostEditor = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    //백엔드에서도 막기
+    if (selectedSchedule && (name === "startTime" || name === "endTime")) {
+      const originStart = formatToInputTime(selectedSchedule.start_time);
+      const originEnd = formatToInputTime(selectedSchedule.end_time);
+
+      if (value < originStart || value > originEnd) {
+        openPopup({
+          title: "시간 오류",
+          content: "기존 근무 시간 범위 내에서만 선택할 수 있습니다."
+        });
+        return;
+      }
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -62,6 +79,8 @@ const PostEditor = () => {
         openPopup({ title: '권한 없음', content: '자신의 스케줄만 선택할 수 있습니다.' });
         return;
       }
+      
+      setSelectedSchedule(schedule);
 
       setFormData((prev) => ({ 
         ...prev, 
@@ -222,7 +241,8 @@ const PostEditor = () => {
             value={formData.startTime}
             disabled={loading}
             onChange={handleChange}
-            readOnly
+            min={selectedSchedule ? formatToInputTime(selectedSchedule.start_time) : undefined}
+            max={selectedSchedule ? formatToInputTime(selectedSchedule.end_time) : undefined}
           />
 
           {formData.isAlert && !formData.endTime && (<p className={styles.errorText}>근무 끝 시간을 선택해주세요.</p>)}
@@ -235,7 +255,8 @@ const PostEditor = () => {
             value={formData.endTime}
             disabled={loading}
             onChange={handleChange}
-            readOnly
+            min={selectedSchedule ? formatToInputTime(selectedSchedule.start_time) : undefined}
+            max={selectedSchedule ? formatToInputTime(selectedSchedule.end_time) : undefined}
           />
 
           {formData.isAlert && (!formData.wage || Number(formData.wage) <= 0) && (<p className={styles.errorText}>시급을 입력해주세요.</p>)}

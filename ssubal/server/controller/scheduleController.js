@@ -4,7 +4,7 @@ const { sendPushNotification } = require("../utils");
 
 const acceptApplicant = async (req, res) => {
   const { id } = req.user;
-  const { applicantId, groupId } = req.params; 
+  const { applicantId, groupId } = req.params;
   const participantId = req.participantId;
 
   const connection = await pool.getConnection();
@@ -13,18 +13,18 @@ const acceptApplicant = async (req, res) => {
     await connection.beginTransaction();
 
     const [applicantRows] = await connection.query(
-      `select 
-        sa.post_id, 
+      `select
+        sa.post_id,
         sa.applicant_id,
         sp.writer_id,
         fs.position,
         sp.date,
         sp.start_time,
-        sp.end_time 
+        sp.end_time
       from substitute_applicants sa
-      join substitute_posts sp on sa.post_id = sp.id 
+      join substitute_posts sp on sa.post_id = sp.id
       left join fixed_schedules fs on sp.writer_id = fs.worker_id
-      where sa.id = ?`, //여기서 applicant_id는 group_participants의 id
+      where sa.id = ?`,
       [applicantId]
     );
 
@@ -43,11 +43,11 @@ const acceptApplicant = async (req, res) => {
     //신규 근무자의 해당 날짜 유동 스케줄 조회(결석 처리된 null 건은 제외)
     const [targetWorkerFlex] = await connection.query(`
       select start_time, end_time from flexible_schedules
-      where worker_id = ? 
+      where worker_id = ?
         and date_format(\`date\`, '%Y-%m-%d') = date_format(?, '%Y-%m-%d')
         and start_time is not null
     `, [workerId, date]);
-    
+
     const hasFlexOverlap = targetWorkerFlex.some(flex => {
       const fStart = String(flex.start_time).substring(0, 5);
       const fEnd = String(flex.end_time).substring(0, 5);
@@ -64,7 +64,7 @@ const acceptApplicant = async (req, res) => {
       select start_time, end_time from fixed_schedules
       where worker_id = ? and \`day\` = ?
     `, [workerId, dayOfWeek]);
-    
+
     if(targetWorkerFixed.length > 0) {
       const [canceledCheck] = await connection.query(`
         select id from flexible_schedules
@@ -75,7 +75,6 @@ const acceptApplicant = async (req, res) => {
 
       const isCanceled = canceledCheck.length > 0;
 
-      //고정 근무가 취소되지 않았다면 시간 중복 체크
       if(!isCanceled) {
         const hasFixedOverlap = targetWorkerFixed.some(fixed => {
           const fxStart = String(fixed.start_time).substring(0, 5);
@@ -87,12 +86,12 @@ const acceptApplicant = async (req, res) => {
           await connection.rollback();
           return res.status(400).json({ code: "SCHEDULE_OVERLAP_ERROR", message: "근무 시간 중복" });
         }
-      }
+      }      
     }
 
     await connection.query(
       `update substitute_applicants
-      set status = case 
+      set status = case
         when id = ? then 'ACCEPTED'
         else 'REJECTED'
       end
@@ -105,38 +104,114 @@ const acceptApplicant = async (req, res) => {
       [postId]
     );
 
-    //기존 유저 스케줄 취소하기
+    //기존 유저 스케줄 불러오기
     const [flexibleSchedulesRows] = await connection.query(
       `select * from flexible_schedules
-      where worker_id = ? and DATE_FORMAT(\`date\`, '%Y-%m-%d') = DATE_FORMAT(?, '%Y-%m-%d') and start_time = ?`,
-      [writerId, date, startTime]
+      where worker_id = ? and DATE_FORMAT(\`date\`, '%Y-%m-%d') = DATE_FORMAT(?, '%Y-%m-%d')`,
+      [writerId, date]
     );
 
-    if(flexibleSchedulesRows.length > 0) { //유동 근무인 경우
-      const originFlexId = flexibleSchedulesRows[0].id;
+    const [fixedSchedulesRows] = await connection.query(
+      `select * from fixed_schedules
+      where worker_id = ? and day = ?`,
+      [writerId, dayOfWeek]
+    );
+
+    if(flexibleSchedulesRows.length > 0) {     
+      const targetFlexSchedule = flexibleSchedulesRows.find(flex => {
+        const fStart = String(flex.start_time).substring(0, 5);
+        const fEnd = String(flex.end_time).substring(0, 5);
+        return (subStart < fEnd) && (subEnd > fStart);
+      });
+      
+      const originFlexId = targetFlexSchedule.id;
       await connection.query(
         `delete from flexible_schedules where id = ?`, [originFlexId]
       );
 
-    } else {
-      //고정 근무인 경우 null 데이터 추가
-      await connection.query(
-        `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage) values (?, ?, ?, null, null, 0)`, [writerId, date, position]
-      );
+      if(targetFlexSchedule) {      
+        const originStart = String(targetFlexSchedule.start_time).substring(0,5);
+
+        if(originStart !== subStart) {
+          await connection.query(
+            `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage) 
+            select ?, \`date\`, ?, ?, ?, wage
+            from substitute_posts_data 
+            where id = ?`,
+            [writerId, position, originStart, subStart, postId]
+          );
+        }
+
+        const originEnd = String(targetFlexSchedule.end_time).substring(0,5);
+
+        if(originEnd !== subEnd) {
+          await connection.query(
+            `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage)
+            select ?, \`date\`, ?, ?, ?, wage
+            from substitute_posts_data
+            where id = ?`,
+            [writerId, position, subEnd, originEnd, postId]
+          )
+        }
+
+        await connection.query(
+          `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage)
+          select ?, \`date\`, ?, start_time, end_time, wage
+          from substitute_posts_data 
+          where id = ?`,
+          [workerId, position, postId]
+        );
+      }
+    }  
+
+    if(fixedSchedulesRows.length > 0) {
+      const targetFixedSchedule = fixedSchedulesRows.find(fixed => {
+        const fStart = String(fixed.start_time).substring(0, 5);
+        const fEnd = String(fixed.end_time).substring(0, 5);
+        return (subStart < fEnd) && (subEnd > fStart);
+      });
+
+      if(targetFixedSchedule) {
+        await connection.query(
+          `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage) values (?, ?, ?, null, null, 0)`, [writerId, date, position]
+        );
+      
+        const originStart = String(targetFixedSchedule.start_time).substring(0,5);
+
+        if(originStart !== subStart) {
+          await connection.query(
+            `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage) 
+            select ?, \`date\`, ?, ?, ?, wage
+            from substitute_posts_data 
+            where id = ?`,
+            [writerId, position, originStart, subStart, postId]
+          );
+        }
+
+        const originEnd = String(targetFixedSchedule.end_time).substring(0,5);
+
+        if(originEnd !== subEnd) {
+          await connection.query(
+            `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage)
+            select ?, \`date\`, ?, ?, ?, wage
+            from substitute_posts_data
+            where id = ?`,
+            [writerId, position, subEnd, originEnd, postId]
+          )
+        }
+
+        await connection.query(
+          `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage)
+          select ?, \`date\`, ?, start_time, end_time, wage
+          from substitute_posts_data 
+          where id = ?`,
+          [workerId, position, postId]
+        );
+      }
     }
-    
-    //flexible_schedule에 새 근무자 추가하기
-    //substitute_posts_data로 고침
-    await connection.query(
-      `insert into flexible_schedules (worker_id, \`date\`, position, start_time, end_time, wage)
-      select ?, \`date\`, ?, start_time, end_time, wage
-      from substitute_posts_data 
-      where id = ?`,
-      [workerId, position, postId]
-    )
 
     const [workerRows] = await connection.query(`
-      select u.id, u.push_token from users u join group_participants gp on u.id = gp.user_id where gp.id = ?;
+      select u.id, u.push_token from users u join group_participants gp on u.id = gp.user_id where gp.id = ?
     `, [workerId]);
 
     const [postRows] = await connection.query(`select title from substitute_posts_data where id = ?`,
@@ -166,10 +241,9 @@ const acceptApplicant = async (req, res) => {
       sendPushNotification(pushTokens, pushTitle, pushBody, pushData);
     }
 
-    res.status(200).json({ code: "APPLICANT_ACCEPTED_SUCCESS", message: "지원 수락 성공", applicantId: workerId }); //workerId 맞음?
+    res.status(200).json({ code: "APPLICANT_ACCEPTED_SUCCESS", message: "지원 수락 성공", applicantId: workerId }); 
 
   } catch(error) {
-    console.error(error);
     await connection.rollback();
     return res.status(500).json({ code: "SERVER_ERROR", message: "서버 에러" });
   } finally {
